@@ -43,7 +43,7 @@ const SignUp: React.FC = () => {
                 console.log('teste');
               }}
             >
-              Entrar
+              Cadastrar
             </Button>
           </Container>
         </ScrollView>

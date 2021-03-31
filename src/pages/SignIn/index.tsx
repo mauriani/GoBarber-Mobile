@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   Image,
   View,
@@ -8,7 +8,9 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
+
 import { Form } from '@unform/mobile';
+import { FormHandles } from '@unform/core';
 
 import logo from '../../assets/logo.png';
 
@@ -30,6 +32,7 @@ interface SignInForm {
 }
 
 const SignIn: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
 
   const handleSignIn = useCallback((data: SignInForm) => {
@@ -52,12 +55,12 @@ const SignIn: React.FC = () => {
               <Title>Faça seu login</Title>
             </View>
 
-            <Form onSubmit={handleSignIn}>
+            <Form ref={formRef} onSubmit={handleSignIn}>
               <Input name="email" icon="mail" placeholder="E-mail" />
               <Input name="password" icon="lock" placeholder="Senha" />
               <Button
                 onPress={() => {
-                  console.log('teste');
+                  formRef.current?.submitForm();
                 }}
               >
                 Entrar

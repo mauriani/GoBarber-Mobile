@@ -6,6 +6,7 @@
         "plugin:react/recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:prettier/recommended",
+        "@react-native-community",
         "airbnb"
     ],
     "globals": {
@@ -26,11 +27,6 @@
         "react-hooks"
     ],
     "rules": {
-      "react/jsx-props-no-spreading":"off",
-      "react/prop-types":"off",
-      "import/first":"off",
-      "import/prefer-default-export": "off",
-      "arrow-body-style":"off",
       "prettier/prettier": "error",
       "react-hooks/rules-of-hooks": "error",
 	    "react-hooks/exhaustive-deps": "warn",
