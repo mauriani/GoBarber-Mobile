@@ -6,11 +6,16 @@ import {
   Platform,
   ScrollView,
   TextInput,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
+import * as Yup from 'yup';
+
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+
+import getValidationErros from '../../utils/getValidationErrors';
 
 import logo from '../../assets/logo.png';
 
@@ -32,10 +37,36 @@ const SignUp: React.FC = () => {
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
-  const handleSignUp = useCallback((data: SignUpForm) => {
-    console.log(data);
-  }, []);
+  const handleSignUp = useCallback(async (data: SignUpForm) => {
+    try {
+      formRef.current?.setErrors({});
+      const schema = Yup.object().shape({
+        name: Yup.string().required('Nome obrigatório'),
+        email: Yup.string()
+          .required('Email obrigatório')
+          .email('Digite um e-mail válido'),
+        password: Yup.string().min(6, 'Mínimo seis caracteres'),
+      });
+      // esse abortEarly retorna todos os erros que ele encontra e nao o primeiro erro que encontar
+      await schema.validate(data, { abortEarly: false });
 
+      // await api.post('/users', data);
+
+      // history.push('/');
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErros(err);
+        formRef.current?.setErrors(errors);
+
+        return;
+      }
+
+      Alert.alert(
+        'Erro na autentificação',
+        'Ocorreu um erro ao fazer cadastro, tente novamente.',
+      );
+    }
+  }, []);
   return (
     <>
       <KeyboardAvoidingView
