@@ -27,6 +27,7 @@
         "react-hooks"
     ],
     "rules": {
+      "camelcase":"off",
       "@typescript-eslint/no-explicit-any":"off",
       "no-shadow":"off",
       "prettier/prettier": "error",
