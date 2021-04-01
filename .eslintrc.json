@@ -3,11 +3,11 @@
         "es2021": true
     },
     "extends": [
-        "plugin:react/recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:prettier/recommended",
-        "@react-native-community",
-        "airbnb"
+      "plugin:react/recommended",
+      "airbnb",
+      "plugin:prettier/recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
     ],
     "globals": {
       "__DEV__": "readonly"
@@ -27,7 +27,11 @@
         "react-hooks"
     ],
     "rules": {
+      "@typescript-eslint/no-explicit-any":"off",
+      "no-shadow":"off",
       "prettier/prettier": "error",
+      "react/prop-types":"off",
+      "react/jsx-props-no-spreading":"off",
       "react-hooks/rules-of-hooks": "error",
 	    "react-hooks/exhaustive-deps": "warn",
 	    "react/jsx-filename-extension": [
