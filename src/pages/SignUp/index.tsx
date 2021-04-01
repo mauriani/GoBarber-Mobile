@@ -16,6 +16,7 @@ import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 
 import getValidationErros from '../../utils/getValidationErrors';
+import api from '../../services/api';
 
 import logo from '../../assets/logo.png';
 
@@ -50,9 +51,14 @@ const SignUp: React.FC = () => {
       // esse abortEarly retorna todos os erros que ele encontra e nao o primeiro erro que encontar
       await schema.validate(data, { abortEarly: false });
 
-      // await api.post('/users', data);
+      Alert.alert(
+        'Cadastro realizado com sucesso.',
+        'Você já pode fazer login na aplicação',
+      );
 
-      // history.push('/');
+      await api.post('/users', data);
+
+      navigation.goBack();
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErros(err);
