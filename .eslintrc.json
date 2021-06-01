@@ -29,7 +29,8 @@
     "rules": {
       "import/first":"off",
       "react/jsx-one-expression-per-line": "off",
-      "camelcase":"off",
+      "camelcase": "off",
+      "@typescript-eslint/camelcase":"off",
       "@typescript-eslint/no-explicit-any":"off",
       "no-shadow":"off",
       "prettier/prettier": "error",
