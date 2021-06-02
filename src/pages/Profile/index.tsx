@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
+import ImagePicker from 'react-native-image-picker';
 import * as Yup from 'yup';
 
 import { Form } from '@unform/mobile';
@@ -29,16 +30,19 @@ import {
   UserAvatarButton,
   UserAvatar,
 } from './styles';
+
 import { useAuth } from '../../hooks/auth';
 
-interface SignUpFormData {
+interface ProfileFormDate {
   name: string;
   email: string;
   password: string;
+  old_password: string;
+  password_confirmation: string;
 }
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
 
@@ -48,26 +52,59 @@ const Profile: React.FC = () => {
   const confirmPasswordInputRef = useRef<TextInput>(null);
 
   const handleSignUp = useCallback(
-    async (data: SignUpFormData) => {
+    async (data: ProfileFormDate) => {
       try {
         formRef.current?.setErrors({});
 
         const schema = Yup.object().shape({
-          name: Yup.string().required('Nome é obrigatório'),
+          name: Yup.string().required('Nome Obrigatório'),
           email: Yup.string()
-            .required('E-mail é obrigatório')
+            .required('Email obrigatório')
             .email('Digite um e-mail válido'),
-          password: Yup.string().min(6, 'No mínimo 6 dígitos'),
+          old_password: Yup.string(),
+          password: Yup.string().when('old_password', {
+            is: val => !!val.length, // verificao de campo
+            then: Yup.string().required('Campo obrigatório'),
+            otherwise: Yup.string(),
+          }),
+          password_confirmation: Yup.string()
+            .when('password', {
+              is: val => !!val.length, // verificao de campo
+              then: Yup.string().required('Campo obrigatório'),
+              otherwise: Yup.string(),
+            })
+            .nullable()
+            .oneOf([Yup.ref('password'), null], 'Confirmação incorreta'),
         });
 
         await schema.validate(data, { abortEarly: false });
 
-        await api.post('/users', data);
+        // // esse abortEarly retorna todos os erros que ele encontra
+        // e nao o primeiro erro que encontar
+        await schema.validate(data, { abortEarly: false });
 
-        Alert.alert(
-          'Cadastro realizado com sucesso!',
-          'Você ja pode fazer login na aplicação.',
-        );
+        const {
+          name,
+          email,
+          old_password,
+          password,
+          password_confirmation,
+        } = data;
+
+        const formData = {
+          name,
+          email,
+          ...(old_password
+            ? { old_password, password, password_confirmation }
+            : {}),
+        };
+
+        const response = await api.put('/profile', formData);
+
+        updateUser(response.data);
+
+        Alert.alert('Perfil atualizado com sucesso!');
+
         navigation.goBack();
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
@@ -78,17 +115,52 @@ const Profile: React.FC = () => {
         }
 
         Alert.alert(
-          'Erro na cadastro',
-          'Ocorreu um error ao fazer cadastro, tente novamente.',
+          'Erro na atualização do perfil',
+          'Ocorreu um error ao atualizar seu perfil, tente novamente.',
         );
       }
     },
-    [navigation],
+    [navigation, updateUser],
   );
 
   const handleGoBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
+
+  const handleUpdateAvatar = useCallback(() => {
+    ImagePicker.showImagePicker(
+      {
+        title: 'Selecione um avatar',
+        cancelButtonTitle: 'Cancelar',
+        takePhotoButtonTitle: 'Usar camera',
+        chooseFromLibraryButtonTitle: 'Escolha da galeria',
+        quality: 1.0,
+        maxWidth: 500,
+        maxHeight: 500,
+      },
+      response => {
+        if (response.didCancel) {
+          return;
+        }
+        if (response.error) {
+          Alert.alert('Erro ao atualizar seu avatar');
+          return;
+        }
+
+        const data = new FormData();
+
+        data.append('avatar', {
+          type: 'image/jpeg',
+          name: `${user.id}.jpg`,
+          uri: response.uri,
+        });
+
+        api.patch('/users/avatar', data).then(response => {
+          updateUser(response.data);
+        });
+      },
+    );
+  }, [updateUser, user.id]);
 
   return (
     <>
@@ -105,17 +177,21 @@ const Profile: React.FC = () => {
             <BackButton onPress={handleGoBack}>
               <Icon name="chevron-left" size={24} color="#999591" />
             </BackButton>
-            <UserAvatarButton>
+            <UserAvatarButton onPress={handleUpdateAvatar}>
               <UserAvatar source={{ uri: user.avatar_url }} />
             </UserAvatarButton>
             <View>
               <Title>Meu Perfil</Title>
             </View>
-            <Form ref={formRef} onSubmit={handleSignUp}>
+            <Form
+              ref={formRef}
+              initialData={{ name: user.name, email: user.email }}
+              onSubmit={handleSignUp}
+            >
               <Input
                 name="name"
                 icon="user"
-                placeholder={user.name}
+                placeholder="Nome"
                 autoCorrect
                 autoCapitalize="words"
                 returnKeyType="next"
@@ -127,7 +203,7 @@ const Profile: React.FC = () => {
                 ref={emailInputRef}
                 name="email"
                 icon="mail"
-                placeholder={user.email}
+                placeholder="Email"
                 keyboardType="email-address"
                 autoCorrect={false}
                 autoCapitalize="none"
