@@ -28,6 +28,7 @@
     ],
     "rules": {
       "import/first":"off",
+      "@typescript-eslint/ban-types":"off",
       "import/no-duplicates": "off",
       "react/jsx-one-expression-per-line": "off",
       "camelcase": "off",
