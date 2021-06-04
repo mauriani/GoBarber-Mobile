@@ -4,7 +4,7 @@
 
 ## **🚀 Sobre o projeto**
 
- Essa pe a versão web feita durante o curso da rocketseat. Essa aplicação permite que o cliente marque um agendamento com um determinado barbeiro, já os barbeiros/ cabeleireiros podem visualizar quando possuem agendamento, controlando horários.
+ Essa e a versão mobile feita durante o curso da rocketseat. Essa aplicação permite que o cliente marque um agendamento com um determinado barbeiro, já os barbeiros/ cabeleireiros podem visualizar quando possuem agendamento, controlando horários.
 
 - ***Aplicações***
     - [Web](https://github.com/mauriani/GoBarber-Web)
