@@ -37,5 +37,5 @@
 yarn dev:server
 
 #Start Projeto
-yarn start
+npx react-native run-andoid / npx react-native run-ios
 ```
